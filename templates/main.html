@@ -1,0 +1,266 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <script>
+        function allowDrop(ev) {
+            ev.preventDefault();
+            if (ev.target.getAttribute("draggable") === "true")
+                ev.dataTransfer.dropEffect = "none";
+            else
+                ev.dataTransfer.dropEffect = "all";
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev) {
+
+            // console.log(ev.target.childElementCount)
+            if (ev.target.childElementCount > 0) {
+                return false
+            }
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            ev.target.appendChild(document.getElementById(data));
+
+            checkAnswer();
+        }
+
+        function shuffle(a) {
+            var j, x, i;
+            for (i = a.length - 1; i > 0; i--) {
+                j = Math.floor(Math.random() * (i + 1));
+                x = a[i];
+                a[i] = a[j];
+                a[j] = x;
+            }
+            return a;
+        }
+
+        function checkAnswer() {
+            for (const element of document.getElementsByClassName("fields")) {
+                if (element.childNodes.length === 0) {
+                    document.getElementById("result_text").innerHTML = ""
+                    return;
+                } else if (element.expected !== element.childNodes[0].textContent) {
+                    document.getElementById("result_text").innerHTML = ""
+                    return;
+                } else {
+                }
+            }
+            document.getElementById("result_text").innerHTML = "Correct!";
+        }
+
+        function removeAllChildNodes(parent) {
+            while (parent.firstChild) {
+                parent.removeChild(parent.firstChild);
+            }
+        }
+
+        function previous() {
+            initialize(document.previous_letter)
+        }
+
+        function random() {
+            initialize(document.random_letter)
+        }
+
+        function next() {
+            initialize(document.next_letter)
+        }
+
+        function refresh(letter) {
+            letter = letter.toUpperCase();
+            let previous_letter;
+            let next_letter;
+            if (letter === "A") {
+                document.previous_letter = "Z";
+            } else {
+                document.previous_letter = String.fromCharCode(letter.toUpperCase().charCodeAt(0) - 1);
+            }
+
+            if (letter === "Z") {
+                document.next_letter = "A";
+            } else {
+                document.next_letter = String.fromCharCode(letter.toUpperCase().charCodeAt(0) + 1);
+            }
+
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            document.random_letter = alphabet[Math.floor(Math.random() * alphabet.length)];
+
+            main_div = document.getElementById("main")
+            removeAllChildNodes(main_div)
+            // document.open();
+            const div1 = document.createElement("div");
+            const div2 = document.createElement("div");
+            const div3 = document.createElement("div");
+            const div4 = document.createElement("div");
+
+            div1.id = "options";
+            div1.style.display = "flex";
+            div1.style.justifyContent = "center";
+
+            div2.id = "answer";
+            div2.style.display = "flex";
+            div2.style.justifyContent = "center";
+
+            div3.id = "result";
+            div3.style.display = "flex";
+            div3.style.justifyContent = "center";
+
+            const result_p = document.createElement("p");
+            result_p.id = "result_text";
+            result_p.style.fontSize = "50px";
+            result_p.style.height = "50px";
+            div3.appendChild(result_p);
+
+            div4.id = "navigation";
+            div4.style.display = "flex";
+            div4.style.justifyContent = "center";
+
+            const button_previous = document.createElement("button");
+            const button_random = document.createElement("button");
+            const button_next = document.createElement("button");
+
+            button_previous.style.height = "50px";
+            button_previous.style.width = "180px";
+            button_previous.style.margin = "10px";
+            button_previous.style.fontSize = "20px";
+            button_previous.innerText = "<< Previous";
+            button_previous.onclick = previous;
+
+            button_random.style.height = "50px";
+            button_random.style.width = "180px";
+            button_random.style.margin = "10px";
+            button_random.style.fontSize = "20px";
+            button_random.innerText = "Random";
+            button_random.onclick = random;
+
+            button_next.style.height = "50px";
+            button_next.style.width = "180px";
+            button_next.style.margin = "10px";
+            button_next.style.fontSize = "20px";
+            button_next.innerText = "Next >>";
+            button_next.onclick = next;
+
+            div4.appendChild(button_previous);
+            div4.appendChild(button_random);
+            div4.appendChild(button_next);
+
+
+            main_div.appendChild(div1)
+            main_div.appendChild(div2)
+            main_div.appendChild(div3)
+            main_div.appendChild(div4)
+
+
+        }
+
+        function initialize(letter) {
+            var WORDS = {
+                "A": "APPLE",
+                "B": "BALL",
+                "C": "CAT",
+                "D": "DOG",
+                "E": "ELEPHANT",
+                "F": "FISH",
+                "G": "GRAPES",
+                "H": "HAT",
+                "I": "IGLOO",
+                "J": "JUG",
+                "K": "KITE",
+                "L": "LION",
+                "M": "MONKEY",
+                "N": "NEST",
+                "O": "OCTOPUS",
+                "P": "PARROT",
+                "Q": "QUEEN",
+                "R": "RABBIT",
+                "S": "SOCK",
+                "T": "TURTLE",
+                "U": "UMBRELLA",
+                "V": "VULTURE",
+                "W": "WATERMELON",
+                "X": "XYLOPHONE",
+                "Y": "YATCH",
+                "Z": "ZEBRA"
+            }
+            const word = WORDS[letter];
+            var options_array = [];
+
+            refresh(letter);
+
+            for (let i = 0; i < word.length; i++) {
+                const div = document.createElement("div");
+                div.style.width = "50px";
+                div.style.height = "50px";
+                div.style.margin = "2px";
+                div.style.border = "solid";
+                div.style.display = "flex";
+                div.style.justifyContent = "center";
+                div.style.alignItems = "center";
+                div.style.float = "left";
+                div.id = "field" + i;
+                div.className = "fields"
+                div.expected = word.charAt(i);
+                document.getElementById("answer").appendChild(div);
+
+                const p1 = document.createElement("p");
+                p1.style.width = "48px";
+                p1.style.height = "48px";
+                p1.id = "letter" + i;
+                p1.style.fontSize = "45px";
+                p1.style.margin = "0px";
+                p1.style.display = "flex";
+                p1.style.justifyContent = "center";
+                p1.style.alignItems = "center";
+                p1.innerHTML = word.charAt(i);
+                if (i % 4 === 0) {
+                    p1.style.backgroundColor = "gray"
+                    div.appendChild(p1);
+                } else {
+                    div.ondragover = allowDrop;
+                    div.ondrop = drop;
+
+                    const div1 = document.createElement("div");
+                    div1.style.width = "50px";
+                    div1.style.height = "50px";
+                    div1.style.margin = "2px";
+                    div1.style.border = "solid";
+                    div1.style.display = "flex";
+                    div1.style.justifyContent = "center";
+                    div1.style.alignItems = "center";
+                    div1.style.float = "left";
+                    div1.className = "options"
+                    div1.id = "option" + i;
+                    div1.ondragover = allowDrop;
+                    div1.ondrop = drop;
+                    options_array.push(div1);
+
+                    p1.style.backgroundColor = "green"
+                    p1.draggable = true;
+                    p1.ondragstart = drag;
+                    p1.ondragover = "return false"
+                    div1.appendChild(p1);
+                }
+            }
+            for (const option of shuffle(options_array)) {
+                document.getElementById("options").appendChild(option);
+            }
+        }
+    </script>
+</head>
+<body onload="initialize('A')" style="display: grid; justify-content: center">
+<div id="main"></div>
+<!--<div id="options" style="display: flex; justify-content: center"></div>-->
+<!--<div id="answer" style="display: flex; justify-content: center"></div>-->
+<!--<div id="result" style="display: flex; justify-content: center"><p id="result_text"-->
+<!--                                                                   style="font-size: 50px; height: 50px"></p></div>-->
+<!--<div id="navigation" style="display: flex; justify-content: center">-->
+<!--    <button style="height: 50px; width: 180px; margin: 10px; font-size: 20px"><< Previous</button>-->
+<!--    <button style="height: 50px; width: 180px; margin: 10px; font-size: 20px">Random</button>-->
+<!--    <button style="height: 50px; width: 180px; margin: 10px; font-size: 20px">Next >></button>-->
+<!--</div>-->
+</body>
+</html>
